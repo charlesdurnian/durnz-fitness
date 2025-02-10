@@ -9,6 +9,19 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Profiles Table (User Details)
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  external_profile_id UUID NULL,
+  username TEXT,  
+  bio TEXT,
+  avatar_url TEXT DEFAULT 'default-avatar.png',
+  privacy TEXT CHECK (privacy IN ('public', 'private', 'friends-only')) DEFAULT 'public',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT
+);
+
 -- Workouts Table
 CREATE TABLE IF NOT EXISTS workouts (
   id SERIAL PRIMARY KEY,
