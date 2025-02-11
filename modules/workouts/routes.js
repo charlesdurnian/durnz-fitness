@@ -1,4 +1,5 @@
 import express from "express";
+import { authenticateUser } from "../auth/middleware.js";
 import { fetchWorkouts,
     addWorkout,
     addComment,

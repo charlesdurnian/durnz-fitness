@@ -1,10 +1,7 @@
-import express from "express";
 import { registerUser, loginUser } from "./service.js";
 
-const router = express.Router();
-
-// 🔹 Register Endpoint
-router.post("/register", async (req, res) => {
+// 🔹 Register Controller
+export const handleRegister = async (req, res) => {
   const { email, password, role } = req.body;
   try {
     const user = await registerUser(email, password, role);
@@ -12,10 +9,10 @@ router.post("/register", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
+};
 
-// 🔹 Login Endpoint
-router.post("/login", async (req, res) => {
+// 🔹 Login Controller
+export const handleLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
     const { token, user } = await loginUser(email, password);
@@ -23,6 +20,4 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
-});
-
-export default router;
+};

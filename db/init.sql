@@ -1,8 +1,10 @@
 -- backend/db/init.sql
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Users Table
+-- Users Table (Fix: Use UUID)
 CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- ✅ Changed from SERIAL to UUID
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
   role TEXT CHECK (role IN ('admin', 'user')) NOT NULL DEFAULT 'user',
@@ -15,36 +17,35 @@ CREATE TABLE IF NOT EXISTS profiles (
   user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   external_profile_id UUID NULL,
   username TEXT,  
-  bio TEXT,
   avatar_url TEXT DEFAULT 'default-avatar.png',
-  privacy TEXT CHECK (privacy IN ('public', 'private', 'friends-only')) DEFAULT 'public',
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT
+  updated_at TIMESTAMP DEFAULT NOW() 
 );
 
 -- Workouts Table
 CREATE TABLE IF NOT EXISTS workouts (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- ✅ Changed to UUID
   name TEXT NOT NULL,
   description TEXT,
   exercises JSONB,
+  author_id UUID REFERENCES users(id) ON DELETE SET NULL, -- ✅ Matches users.id
   created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Blog Posts Table
 CREATE TABLE IF NOT EXISTS blog_posts (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- ✅ Changed to UUID
   title TEXT NOT NULL,
   content TEXT NOT NULL,
-  author TEXT NOT NULL,
+  author_id UUID REFERENCES users(id) ON DELETE SET NULL, -- ✅ Matches users.id
   created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Comments Table
-CREATE TABLE comments (
-  id SERIAL PRIMARY KEY,
-  workout_id INT REFERENCES workouts(id) ON DELETE CASCADE,
-  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS comments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  workout_id UUID REFERENCES workouts(id) ON DELETE CASCADE, 
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );

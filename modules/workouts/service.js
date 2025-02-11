@@ -1,4 +1,4 @@
-import pool from "../../db/db.js";
+import pool from "../../../db/db.js";
 
 export const getAllWorkouts = async () => {
   const result = await pool.query("SELECT * FROM workouts ORDER BY created_at DESC");
