@@ -1,14 +1,14 @@
-import pool from "../../../db/db.js";
+import pool from "../../db/db.js";
 
 export const getAllWorkouts = async () => {
   const result = await pool.query("SELECT * FROM workouts ORDER BY created_at DESC");
   return result.rows;
 };
 
-export const createWorkout = async (name, description, exercises) => {
+export const createWorkout = async (name, workout, standards, scaling) => {
   const result = await pool.query(
-    "INSERT INTO workouts (name, description, exercises) VALUES ($1, $2, $3) RETURNING *",
-    [name, description, JSON.stringify(exercises)]
+    "INSERT INTO workouts (name, workout, standards, scaling) VALUES ($1, $2, $3 ,$4) RETURNING *",
+    [name, workout, standards, scaling]
   );
   return result.rows[0];
 };
@@ -35,5 +35,12 @@ export const addCommentService = async (workoutId, userId, content) => {
   };
 
   export const deleteCommentService = async (commentId) => {
-    await pool.query("DELETE FROM comments WHERE id = $1", [commentId]);
+    const result = await pool.query("DELETE FROM comments WHERE id = $1 RETURNING *", [commentId]);
+  
+    if (result.rowCount === 0) {
+      return null; // No comment was deleted
+    }
+  
+    return result.rows[0]; // Return deleted comment
   };
+  

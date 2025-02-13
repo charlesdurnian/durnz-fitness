@@ -20,13 +20,13 @@ const createTables = async () => {
   try {
     const sql = await readFile("./db/init.sql", "utf-8");
     await pool.query(sql);
-    console.log("Database tables checked/created");
+    console.log("✅ Database tables checked/created");
   } catch (err) {
-    console.error("Error initializing database:", err);
+    console.error("❌ Error initializing database:", err);
   }
 };
 
-// Initialize Tables
+// Run the function to initialize tables
 await createTables();
 
 // Register Routes

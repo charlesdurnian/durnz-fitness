@@ -25,9 +25,10 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- Workouts Table
 CREATE TABLE IF NOT EXISTS workouts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- ✅ Changed to UUID
-  name TEXT NOT NULL,
-  description TEXT,
-  exercises JSONB,
+  name TEXT NOT NULL, -- ✅ Workout name
+  workout TEXT NOT NULL, -- ✅ Workout details
+  standards JSONB, -- ✅ Standards (JSONB for structured data)
+  scaling JSONB, -- ✅ Scaling options (JSONB for structured data)
   author_id UUID REFERENCES users(id) ON DELETE SET NULL, -- ✅ Matches users.id
   created_at TIMESTAMP DEFAULT NOW()
 );
