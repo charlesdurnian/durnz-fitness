@@ -26,12 +26,18 @@ CREATE TABLE IF NOT EXISTS profiles (
 CREATE TABLE IF NOT EXISTS workouts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- ✅ Changed to UUID
   name TEXT NOT NULL, -- ✅ Workout name
-  workout TEXT NOT NULL, -- ✅ Workout details
-  standards JSONB, -- ✅ Standards (JSONB for structured data)
+  type TEXT NOT NULL DEFAULT 'daily', -- ✅ Type: daily, team, dumbbell, bodyweight
+  video_url TEXT, -- ✅ Video explaining the workout
+  details TEXT, -- ✅ Full workout details
+  warm_ups TEXT, -- ✅ Warm-ups for this workout
   scaling JSONB, -- ✅ Scaling options (JSONB for structured data)
+  standards JSONB, -- ✅ Movement standards (JSONB for structured data)
+  movement_standards TEXT, -- ✅ Text version of standards
+  stimulus_strategy TEXT, -- ✅ Strategy for this workout
   author_id UUID REFERENCES users(id) ON DELETE SET NULL, -- ✅ Matches users.id
   created_at TIMESTAMP DEFAULT NOW()
 );
+
 
 -- Blog Posts Table
 CREATE TABLE IF NOT EXISTS blog_posts (

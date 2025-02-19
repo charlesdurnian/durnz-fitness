@@ -1,46 +1,40 @@
 import pool from "../../db/db.js";
 
-export const getAllWorkouts = async () => {
-  const result = await pool.query("SELECT * FROM workouts ORDER BY created_at DESC");
+// Fetch all workouts (default: daily)
+export const getWorkoutsByType = async (type = "daily") => {
+  const result = await pool.query(
+    "SELECT * FROM workouts WHERE type = $1 ORDER BY created_at DESC",
+    [type]
+  );
   return result.rows;
 };
 
-export const createWorkout = async (name, workout, standards, scaling) => {
+// Fetch a workout by date
+export const getWorkoutByDate = async (date, type = "daily") => {
   const result = await pool.query(
-    "INSERT INTO workouts (name, workout, standards, scaling) VALUES ($1, $2, $3 ,$4) RETURNING *",
-    [name, workout, standards, scaling]
+    "SELECT * FROM workouts WHERE DATE(created_at) = $1 AND type = $2",
+    [date, type]
+  );
+  return result.rows[0] || null;
+};
+
+// Create a new workout
+export const createWorkout = async (
+  name,
+  type,
+  video_url,
+  details,
+  warm_ups,
+  scaling,
+  movement_standards,
+  stimulus_strategy
+) => {
+  const result = await pool.query(
+    `INSERT INTO workouts 
+      (name, type, video_url, details, warm_ups, scaling, movement_standards, stimulus_strategy) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+     RETURNING *`,
+    [name, type, video_url, details, warm_ups, scaling, movement_standards, stimulus_strategy]
   );
   return result.rows[0];
 };
-
-export const addCommentService = async (workoutId, userId, content) => {
-    const result = await pool.query(
-      "INSERT INTO comments (workout_id, user_id, content) VALUES ($1, $2, $3) RETURNING *",
-      [workoutId, userId, content]
-    );
-    return result.rows[0];
-  };
-
-  export const getCommentsByWorkoutService = async (workoutId) => {
-    const result = await pool.query(
-      "SELECT comments.*, users.email FROM comments JOIN users ON comments.user_id = users.id WHERE workout_id = $1",
-      [workoutId]
-    );
-    return result.rows;
-  };
-
-  export const getCommentByIdService = async (commentId) => {
-    const result = await pool.query("SELECT * FROM comments WHERE id = $1", [commentId]);
-    return result.rows[0]; // Returns comment or undefined
-  };
-
-  export const deleteCommentService = async (commentId) => {
-    const result = await pool.query("DELETE FROM comments WHERE id = $1 RETURNING *", [commentId]);
-  
-    if (result.rowCount === 0) {
-      return null; // No comment was deleted
-    }
-  
-    return result.rows[0]; // Return deleted comment
-  };
-  

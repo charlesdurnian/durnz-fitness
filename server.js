@@ -7,6 +7,7 @@ import userRoutes from "./modules/user/routes.js";
 import profileRoutes from "./modules/profile/routes.js";
 import blogRoutes from "./modules/blog/routes.js";
 import workoutRoutes from "./modules/workouts/routes.js";
+import commentsRoutes from "./modules/comments/routes.js";
 import { readFile } from "fs/promises";
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/blog", blogRoutes);
 app.use("/api/workouts", workoutRoutes);
+app.use("/api/comments", commentsRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
