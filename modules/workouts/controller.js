@@ -1,14 +1,15 @@
 import { 
-  getWorkoutsByType, 
-  getWorkoutByDate, 
-  createWorkout 
+  getAllWorkouts, 
+  getWorkoutById, 
+  createWorkout, 
+  updateWorkout, 
+  deleteWorkout 
 } from "./service.js";
 
-// Fetch workouts by type (Daily, Team, Dumbbell, Bodyweight)
-export const fetchWorkoutsByType = async (req, res) => {
+// Fetch all workouts
+export const fetchWorkouts = async (req, res) => {
   try {
-    const { type } = req.params;
-    const workouts = await getWorkoutsByType(type);
+    const workouts = await getAllWorkouts();
     res.json(workouts);
   } catch (err) {
     console.error(err.message);
@@ -16,11 +17,11 @@ export const fetchWorkoutsByType = async (req, res) => {
   }
 };
 
-// Fetch a workout by date
-export const fetchWorkoutByDate = async (req, res) => {
+// Fetch a workout by ID
+export const fetchWorkoutById = async (req, res) => {
   try {
-    const { date, type } = req.params;
-    const workout = await getWorkoutByDate(date, type);
+    const { workoutId } = req.params;
+    const workout = await getWorkoutById(workoutId);
     if (!workout) return res.status(404).json({ error: "Workout not found" });
 
     res.json(workout);
@@ -32,20 +33,43 @@ export const fetchWorkoutByDate = async (req, res) => {
 
 // Add a new workout
 export const addWorkout = async (req, res) => {
-  const { name, type, video_url, details, warm_ups, scaling, movement_standards, stimulus_strategy } = req.body;
-  
+  const { name, variations } = req.body;
+  const authorId = req.user.id;
+
   try {
-    const newWorkout = await createWorkout(
-      name,
-      type,
-      video_url,
-      details,
-      warm_ups,
-      scaling,
-      movement_standards,
-      stimulus_strategy
-    );
+    const newWorkout = await createWorkout(name, variations, authorId);
     res.status(201).json(newWorkout);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// Update an existing workout
+export const updateWorkoutController = async (req, res) => {
+  const { workoutId } = req.params;
+  const updates = req.body;
+
+  try {
+    const updatedWorkout = await updateWorkout(workoutId, updates);
+    if (!updatedWorkout) return res.status(404).json({ error: "Workout not found" });
+
+    res.json(updatedWorkout);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// Delete a workout
+export const deleteWorkoutController = async (req, res) => {
+  const { workoutId } = req.params;
+
+  try {
+    const deletedWorkout = await deleteWorkout(workoutId);
+    if (!deletedWorkout) return res.status(404).json({ error: "Workout not found" });
+
+    res.json({ message: "Workout deleted successfully" });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: "Internal Server Error" });

@@ -1,40 +1,44 @@
 import pool from "../../db/db.js";
 
-// Fetch all workouts (default: daily)
-export const getWorkoutsByType = async (type = "daily") => {
-  const result = await pool.query(
-    "SELECT * FROM workouts WHERE type = $1 ORDER BY created_at DESC",
-    [type]
-  );
+// Fetch all workouts
+export const getAllWorkouts = async () => {
+  const result = await pool.query("SELECT * FROM workouts ORDER BY created_at DESC");
   return result.rows;
 };
 
-// Fetch a workout by date
-export const getWorkoutByDate = async (date, type = "daily") => {
-  const result = await pool.query(
-    "SELECT * FROM workouts WHERE DATE(created_at) = $1 AND type = $2",
-    [date, type]
-  );
-  return result.rows[0] || null;
+// Fetch a specific workout by ID
+export const getWorkoutById = async (workoutId) => {
+  const result = await pool.query("SELECT * FROM workouts WHERE id = $1", [workoutId]);
+  return result.rows[0];
 };
 
 // Create a new workout
-export const createWorkout = async (
-  name,
-  type,
-  video_url,
-  details,
-  warm_ups,
-  scaling,
-  movement_standards,
-  stimulus_strategy
-) => {
+export const createWorkout = async (name, variations, authorId) => {
   const result = await pool.query(
-    `INSERT INTO workouts 
-      (name, type, video_url, details, warm_ups, scaling, movement_standards, stimulus_strategy) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
-     RETURNING *`,
-    [name, type, video_url, details, warm_ups, scaling, movement_standards, stimulus_strategy]
+    `INSERT INTO workouts (name, variations, author_id) 
+     VALUES ($1, $2, $3) RETURNING *`,
+    [name, variations, authorId]
   );
   return result.rows[0];
+};
+
+// Update a workout
+export const updateWorkout = async (workoutId, updates) => {
+  const { name, variations } = updates;
+
+  const result = await pool.query(
+    `UPDATE workouts 
+     SET name = $1, variations = $2
+     WHERE id = $3
+     RETURNING *`,
+    [name, variations, workoutId]
+  );
+
+  return result.rows[0]; // Returns the updated workout
+};
+
+// Delete a workout
+export const deleteWorkout = async (workoutId) => {
+  const result = await pool.query("DELETE FROM workouts WHERE id = $1 RETURNING *", [workoutId]);
+  return result.rows[0]; // Returns the deleted workout
 };

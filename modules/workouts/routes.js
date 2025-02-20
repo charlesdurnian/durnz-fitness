@@ -1,16 +1,20 @@
 import express from "express";
-import { authenticateUser } from "../auth/middleware.js";
+import { authenticateUser, isAdmin } from "../auth/middleware.js";
 import { 
-  fetchWorkoutsByType, 
-  fetchWorkoutByDate, 
-  addWorkout 
+  fetchWorkouts, 
+  fetchWorkoutById, 
+  addWorkout, 
+  updateWorkoutController, 
+  deleteWorkoutController 
 } from "./controller.js";
 
 const router = express.Router();
 
-router.get("/:type", fetchWorkoutsByType); // Fetch all workouts of a specific type
-router.get("/:type/:date", fetchWorkoutByDate); // Fetch a workout by date
-router.post("/", authenticateUser, addWorkout); // Create a new workout
+router.get("/", fetchWorkouts); // Fetch all workouts
+router.get("/:workoutId", fetchWorkoutById); // Fetch a specific workout
+router.post("/", authenticateUser, isAdmin, addWorkout); // Create a new workout (Admin only)
+router.put("/:workoutId", authenticateUser, isAdmin, updateWorkoutController); // Update a workout (Admin only)
+router.delete("/:workoutId", authenticateUser, isAdmin, deleteWorkoutController); // Delete a workout (Admin only)
 
 export default router;
 
