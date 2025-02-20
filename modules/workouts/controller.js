@@ -1,6 +1,7 @@
 import { 
   getAllWorkouts, 
   getWorkoutById, 
+  getWorkoutByDate,
   createWorkout, 
   updateWorkout, 
   deleteWorkout 
@@ -22,6 +23,19 @@ export const fetchWorkoutById = async (req, res) => {
   try {
     const { workoutId } = req.params;
     const workout = await getWorkoutById(workoutId);
+    if (!workout) return res.status(404).json({ error: "Workout not found" });
+
+    res.json(workout);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const fetchWorkoutByDate = async (req, res) => {
+  try {
+    const { date } = req.params;
+    const workout = await getWorkoutByDate(date);
     if (!workout) return res.status(404).json({ error: "Workout not found" });
 
     res.json(workout);

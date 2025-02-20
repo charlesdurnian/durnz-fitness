@@ -12,6 +12,15 @@ export const getWorkoutById = async (workoutId) => {
   return result.rows[0];
 };
 
+// Fetch a specific workout by date
+export const getWorkoutByDate = async (date) => {
+  const result = await pool.query(
+    "SELECT * FROM workouts WHERE DATE(created_at) = $1",
+    [date]
+  );
+  return result.rows[0] || null;
+};
+
 // Create a new workout
 export const createWorkout = async (name, variations, authorId) => {
   const result = await pool.query(
